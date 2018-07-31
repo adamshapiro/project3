@@ -1,0 +1,64 @@
+{% extends 'orders/layout.html' %}
+
+{% load static %}
+
+{% block jsfile %}
+<script id="confirmedLayout" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="row border-bottom">
+        <div class="col-9 border-right py-3">
+            <span>{{ order }}</span>
+        </div>
+        <div class="col-3 py-3">
+            <span class="text-capitalize font-weight-bold">
+                {{ status }}
+            </span>
+        </div>
+    </div>
+    {% endverbatim %}
+</script>
+
+<script type="text/javascript" src="{% static 'orders/all_orders.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+<input type="hidden" id="ajaxUrl" data-ajax="{% url 'confirm_order' %}">
+<h1 class="display-3">All Orders:</h1>
+
+<h3>Pending</h3>
+<div id="allPending">
+    {% for order in pending %}
+    <div class="row border-bottom">
+        <div class="col-6 border-right py-3">
+            <span >{{ order }}</span>
+        </div>
+        <div class="col-3 border-right py-3 text-center">
+            <button class="btn btn-success confirm-order" data-order="{{ order.id }}">
+                Confirm Order
+            </button>
+        </div>
+        <div class="col-3 py-3">
+            <span class="text-capitalize font-weight-bold">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<h3 class="border-top border-dark w-100 mt-3 pt-3">Confirmed</h3>
+<div id="allConfirmed">
+    {% for order in confirmed %}
+    <div class="row border-bottom">
+        <div class="col-9 border-right py-3">
+            <span>{{ order }}</span>
+        </div>
+        <div class="col-3 py-3">
+            <span class="text-capitalize font-weight-bold">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

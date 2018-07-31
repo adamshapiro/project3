@@ -1,0 +1,302 @@
+{% extends 'orders/layout.html' %}
+
+{% load static %}
+
+{% block jsfile %}
+<script id="select" type="text/x-handlebars-template">
+    <div class="form-group">
+        {% verbatim %}
+        <label for="toppingsSelect{{ i }}">Topping #{{ i }}</label>
+        <select class="form-control topping-selector" id="toppingSelect{{ i }}">
+        {% endverbatim %}
+        {% for topping in toppings %}
+            <option value="{{ topping.id }}">{{ topping.name }}</option>
+        {% endfor %}
+        </select>
+    </div>
+</script>
+
+<script type="text/javascript" src="{% static 'orders/index.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+<h1 class="display-3">Menu:</h1>
+
+<input type="hidden" id="ajaxUrl" data-ajax="{% url 'add_item' %}">
+
+<div id="accordion">
+    <div class="card">
+        <div class="card-header p-0" id="headerPizza">
+            <h5 class="mb-0">
+                <button class="btn btn-primary btn-block collapsed text-left p-3"
+                data-toggle="collapse" data-target="#collapsePizza"
+                aria-expanded="false" aria-controls="collapsePizza">
+                    Pizzas
+                </button>
+            </h5>
+        </div>
+        <div id="collapsePizza" class="collapse" aria-labelledby="headerPizza"
+        data-parent="#accordion">
+            <div class="card-body p-0">
+                <div id="accordionPizza">
+                    <div class="card">
+                        <div class="card-header p-0" id="headerRegular">
+                            <h5 class="mb-0">
+                                <button class="btn btn-info btn-block collapsed text-left p-3"
+                                data-toggle="collapse" data-target="#collapseRegular"
+                                aria-expanded="false" aria-controls="collapseRegular">
+                                    Regular
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseRegular" class="collapse" aria-labelledby="headerRegular"
+                        data-parent="#accordionPizza">
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                {% for pizza in food.Pizza %}
+                                {% if pizza.type == 'R' %}
+                                    <li class="list-group-item list-group-item-primary"
+                                    data-food="{{ pizza.id }}"
+                                    data-toppings="{{ pizza.toppings_count }}">
+                                        {{ pizza }}
+                                        <span class="float-right">
+                                            <button class="btn btn-success add-pizza"
+                                            data-price="{{ pizza.small_price }}">
+                                                Small: ${{ pizza.small_price }}
+                                            </button>
+                                            <button class="btn btn-success add-pizza"
+                                            data-price="{{ pizza.large_price }}">
+                                                Large: ${{ pizza.large_price }}
+                                            </button>
+                                        </span>
+                                    </li>
+                                {% endif %}
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header p-0" id="headerSicilian">
+                            <h5 class="mb-0">
+                                <button class="btn btn-info btn-block collapsed text-left p-3"
+                                data-toggle="collapse" data-target="#collapseSicilian"
+                                aria-expanded="false" aria-controls="collapseSicilian">
+                                    Sicilian
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseSicilian" class="collapse" aria-labelledby="headerSicilian"
+                        data-parent="#accordionPizza">
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                {% for pizza in food.Pizza %}
+                                {% if pizza.type == 'S' %}
+                                    <li class="list-group-item list-group-item-primary"
+                                    data-food="{{ pizza.id }}"
+                                    data-toppings="{{ pizza.toppings_count }}">
+                                        {{ pizza }}
+                                        <span class="float-right">
+                                            <button class="btn btn-success add-pizza"
+                                            data-price="{{ pizza.small_price }}">
+                                                Small: ${{ pizza.small_price }}
+                                            </button>
+                                            <button class="btn btn-success add-pizza"
+                                            data-price="{{ pizza.large_price }}">
+                                                Large: ${{ pizza.large_price }}
+                                            </button>
+                                        </span>
+                                    </li>
+                                {% endif %}
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header p-0" id="headerSub">
+            <h5 class="mb-0">
+                <button class="btn btn-primary btn-block collapsed text-left p-3"
+                data-toggle="collapse" data-target="#collapseSub"
+                aria-expanded="false" aria-controls="collapseSub">
+                    Subs
+                </button>
+            </h5>
+        </div>
+        <div id="collapseSub" class="collapse" aria-labelledby="headerSub"
+        data-parent="#accordion">
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for sub in food.Sub %}
+                    <li class="list-group-item list-group-item-primary"
+                    data-food="{{ sub.id }}">
+                        {{ sub }}
+                        <span class="float-right">
+                            <button class="btn btn-warning" data-toggle="collapse"
+                            data-target="#collapseSub{{ sub.id }}">
+                                Add Ons
+                            </button>
+                            {% if sub.has_small %}
+                            <button class="btn btn-success add-sub"
+                            data-price="{{ sub.small_price }}">
+                                Small: ${{ sub.small_price }}
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-success add-sub"
+                            data-price="{{ platter.large_price }}">
+                                Large: ${{ sub.large_price }}
+                            </button>
+                        </span>
+                        <div class="collapse" id="collapseSub{{ sub.id }}">
+                            <ul class="list-unstyled">
+                                {% for add_on in sub.add_ons.all %}
+                                <li>
+                                    <input type="checkbox" class="addSubOption"
+                                    value="{{ add_on.id }}">
+                                    <span>+ {{ add_on.name }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header p-0" id="headerPasta">
+            <h5 class="mb-0">
+                <button class="btn btn-primary btn-block collapsed text-left p-3"
+                data-toggle="collapse" data-target="#collapsePasta"
+                aria-expanded="false" aria-controls="collapsePasta">
+                    Pastas
+                </button>
+            </h5>
+        </div>
+        <div id="collapsePasta" class="collapse" aria-labelledby="headerPasta"
+        data-parent="#accordion">
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for pasta in food.Pasta %}
+                    <li class="list-group-item list-group-item-primary"
+                    data-food="{{ pasta.id }}">
+                        {{ pasta }}
+                        <span class="float-right">
+                            <button class="btn btn-success add-item"
+                            data-price="{{ pasta.large_price }}">
+                                ${{ pasta.large_price }}
+                            </button>
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header p-0" id="headerSalad">
+            <h5 class="mb-0">
+                <button class="btn btn-primary btn-block collapsed text-left p-3"
+                data-toggle="collapse"data-target="#collapseSalad"
+                aria-expanded="false" aria-controls="collapseSalad">
+                    Salads
+                </button>
+            </h5>
+        </div>
+        <div id="collapseSalad" class="collapse" aria-labelledby="headerSalad"
+        data-parent="#accordion">
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for salad in food.Salad %}
+                    <li class="list-group-item list-group-item-primary"
+                    data-food="{{ salad.id }}">
+                        {{ salad }}
+                        <span class="float-right">
+                            <button class="btn btn-success add-item"
+                            data-price="{{ salad.large_price }}">
+                                ${{ salad.large_price }}
+                            </button>
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header p-0" id="headerPlatter">
+            <h5 class="mb-0">
+                <button class="btn btn-primary btn-block collapsed text-left p-3"
+                data-toggle="collapse" data-target="#collapsePlatter"
+                aria-expanded="false" aria-controls="collapsePlatter">
+                    Dinner Platters
+                </button>
+            </h5>
+        </div>
+        <div id="collapsePlatter" class="collapse" aria-labelledby="headerPlatter"
+        data-parent="#accordion">
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                {% for platter in food.DinnerPlatter %}
+                    <li class="list-group-item list-group-item-primary"
+                    data-food="{{ platter.id }}">
+                        {{ platter }}
+                        <span class="float-right">
+                            <button class="btn btn-success add-item"
+                            data-price="{{ platter.small_price }}">
+                                Small: ${{ platter.small_price }}
+                            </button>
+                            <button class="btn btn-success add-item"
+                            data-price="{{ platter.large_price }}">
+                                Large: ${{ platter.large_price }}
+                            </button>
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a id="viewCart"
+class="btn btn-success btn-lg mt-3 {% if not items.exists %}disabled{% endif %}"
+href="{% url 'cart' %}">
+View Cart
+<span id="itemCount" class="badge badge-pill badge-light">{{ items|length }}</span>
+</a>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="toppingModal" tabindex="-1" role="dialog" aria-labelledby="toppingModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<div class="modal-header">
+    <h5 class="modal-title" id="toppingModalLabel"></h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div id="toppingModalAlert" class="alert alert-danger d-none" role="alert">
+        You cannot select the same topping more than once.
+    </div>
+    <form id="toppingModalForm">
+
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button type="button" id="toppingModalSubmit" class="btn btn-primary">Enter</button>
+</div>
+</div>
+</div>
+</div>
+
+{% endblock %}

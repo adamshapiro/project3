@@ -1,0 +1,19 @@
+{% extends 'orders/layout.html' %}
+
+{% block body %}
+<h1 class="display-3">Past Orders:</h1>
+
+{% for order in orders %}
+<div class="row w-75 border-bottom">
+    <div class="col border-right py-3">
+        <span class="w-100 text-center">{{ order }}</span>
+    </div>
+    <div class="col-3 py-3">
+        <span class="w-100 text-capitalize font-weight-bold">
+            {{ order.get_status_display }}
+        </span>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
