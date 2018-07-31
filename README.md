@@ -73,3 +73,5 @@ The following files are used:
 * The personal touch in this project is the allowance for users to view past orders
     and whether they are pending or confirmed, and allowing staff to view all past
     orders and confirm pending orders.
+
+* Form layout done with help from [this site](https://simpleisbetterthancomplex.com/article/2017/08/19/how-to-render-django-form-manually.html)
